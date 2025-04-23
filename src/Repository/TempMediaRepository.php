@@ -4,7 +4,6 @@ namespace WechatWorkMediaBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatWorkMediaBundle\Entity\TempMedia;
 
 /**
@@ -15,8 +14,6 @@ use WechatWorkMediaBundle\Entity\TempMedia;
  */
 class TempMediaRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, TempMedia::class);

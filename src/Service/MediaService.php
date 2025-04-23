@@ -73,7 +73,7 @@ class MediaService
             throw new MediaUploadFailedException('媒体资源上传失败');
         }
 
-        $this->cache->set($cacheKey, $res['media_id'], DAY_IN_SECONDS * 2); // 我们只保留2天，减少一些问题
+        $this->cache->set($cacheKey, $res['media_id'], 60 * 60 * 24 * 2); // 我们只保留2天，减少一些问题
 
         return $res['media_id'];
     }
