@@ -2,7 +2,7 @@
 
 namespace WechatWorkMediaBundle\Procedure;
 
-use FileSystemBundle\Service\MountManager;
+use League\Flysystem\FilesystemOperator;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -39,7 +39,7 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
     public function __construct(
         private readonly CorpRepository $corpRepository,
         private readonly AgentRepository $agentRepository,
-        private readonly MountManager $mountManager,
+        private readonly FilesystemOperator $mountManager,
         private readonly MediaService $mediaService,
     ) {
     }
