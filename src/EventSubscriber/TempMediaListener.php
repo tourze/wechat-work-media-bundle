@@ -4,8 +4,8 @@ namespace WechatWorkMediaBundle\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
-use FileSystemBundle\Service\MountManager;
-use FileSystemBundle\Service\TemporaryFileService;
+use League\Flysystem\FilesystemOperator;
+use Tourze\TempFileBundle\Service\TemporaryFileService;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkMediaBundle\Entity\TempMedia;
 use WechatWorkMediaBundle\Request\UploadTempMediaRequest;
@@ -18,7 +18,7 @@ class TempMediaListener
 {
     public function __construct(
         private readonly WorkService $workService,
-        private readonly MountManager $mountManager,
+        private readonly FilesystemOperator $mountManager,
         private readonly TemporaryFileService $temporaryFileService,
     ) {
     }

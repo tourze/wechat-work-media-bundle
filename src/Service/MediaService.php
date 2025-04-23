@@ -2,13 +2,12 @@
 
 namespace WechatWorkMediaBundle\Service;
 
-use EasyWeChat\Kernel\Exceptions\InvalidConfigException;
-use FileSystemBundle\Service\MountManager;
-use FileSystemBundle\Service\TemporaryFileService;
 use GuzzleHttp\Exception\GuzzleException;
+use League\Flysystem\FilesystemOperator;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Tourze\TempFileBundle\Service\TemporaryFileService;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkMediaBundle\Enum\MediaType;
@@ -22,7 +21,7 @@ class MediaService
 {
     public function __construct(
         private readonly CacheInterface $cache,
-        private readonly MountManager $mountManager,
+        private readonly FilesystemOperator $mountManager,
         private readonly TemporaryFileService $temporaryFileService,
         private readonly WorkService $workService,
     ) {
@@ -35,7 +34,6 @@ class MediaService
      *
      * @throws FileNotFoundException
      * @throws MediaUploadFailedException
-     * @throws InvalidConfigException
      * @throws GuzzleException
      * @throws \JsonException
      * @throws InvalidArgumentException
