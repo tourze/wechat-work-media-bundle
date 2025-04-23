@@ -1,1 +1,1 @@
-# wechat-work-media-bundle
+# 企业微信-媒体管理
