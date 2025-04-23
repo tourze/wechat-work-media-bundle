@@ -15,7 +15,7 @@
     "symfony/dependency-injection": "^6.4",
     "symfony/http-kernel": "^6.4",
     "symfony/framework-bundle": "^6.4",
-    "tourze/enum-extra": "0.0.*",
+    "tourze/enum-extra": "~0.0.5",
     "tourze/easy-admin-attribute": "0.0.*",
     "tourze/http-client-bundle": "0.0.*",
     "tourze/doctrine-snowflake-bundle": "0.0.*",
