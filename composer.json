@@ -26,6 +26,7 @@
     "tourze/json-rpc-lock-bundle": "0.0.*",
     "psr/simple-cache": "^1.0|^2.0|^3.0",
     "yiisoft/json": "^1.0",
+    "symfony/yaml": "^6.4 || ^7.1",
     "league/flysystem": "^3.0"
   },
   "autoload": {
@@ -40,9 +41,7 @@
   },
   "require-dev": {
     "phpstan/phpstan": "^2.1",
-    "phpunit/phpunit": "^10.0"
-  },
-  "scripts": {
-    "phpstan": "phpstan analyse src -l 1"
+    "phpunit/phpunit": "^10.0",
+    "shipmonk/composer-dependency-analyser": "^1.8"
   }
 }
