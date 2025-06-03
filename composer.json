@@ -31,6 +31,7 @@
     "tourze/json-rpc-log-bundle": "0.1.*",
     "tourze/symfony-temp-file-bundle": "0.0.*",
     "tourze/wechat-work-bundle": "0.1.*",
+    "tourze/wechat-work-contracts": "0.0.*",
     "yiisoft/json": "^1.0"
   },
   "require-dev": {

@@ -8,7 +8,7 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Tourze\TempFileBundle\Service\TemporaryFileService;
-use WechatWorkBundle\Entity\Agent;
+use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkMediaBundle\Enum\MediaType;
 use WechatWorkMediaBundle\Exception\FileNotFoundException;
@@ -38,7 +38,7 @@ class MediaService
      * @throws \JsonException
      * @throws InvalidArgumentException
      */
-    public function uploadAndGetMediaId(Agent $agent, string $path, MediaType $type): string
+    public function uploadAndGetMediaId(AgentInterface $agent, string $path, MediaType $type): string
     {
         // TODO 改造为存数据库，以方便我们排查附件问题
         // 优先查缓存
@@ -79,7 +79,7 @@ class MediaService
     /**
      * 下载媒体文件，并存储到文件服务器
      */
-    public function downloadMedia(Agent $agent, string $mediaId, ?string $ext = null): string
+    public function downloadMedia(AgentInterface $agent, string $mediaId, ?string $ext = null): string
     {
         $request = new MediaGetRequest();
         $request->setAgent($agent);

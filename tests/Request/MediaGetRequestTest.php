@@ -2,36 +2,93 @@
 
 namespace WechatWorkMediaBundle\Tests\Request;
 
+use HttpClientBundle\Request\ApiRequest;
 use PHPUnit\Framework\TestCase;
 use WechatWorkBundle\Entity\Agent;
+use WechatWorkBundle\Request\RawResponseInterface;
 use WechatWorkMediaBundle\Request\MediaGetRequest;
 
 class MediaGetRequestTest extends TestCase
 {
-    public function testRequestConfiguration(): void
+    private MediaGetRequest $request;
+    private Agent $agent;
+
+    protected function setUp(): void
     {
-        $request = new MediaGetRequest();
-        $agent = new Agent();
+        $this->request = new MediaGetRequest();
+        /** @var Agent $agent */
+        $agent = $this->createMock(Agent::class);
+        $this->agent = $agent;
+    }
+
+    public function test_request_extendsApiRequest(): void
+    {
+        $this->assertInstanceOf(ApiRequest::class, $this->request);
+    }
+
+    public function test_request_implementsRawResponseInterface(): void
+    {
+        $this->assertInstanceOf(RawResponseInterface::class, $this->request);
+    }
+
+    public function test_getRequestPath_returnsCorrectPath(): void
+    {
+        $path = $this->request->getRequestPath();
+        
+        $this->assertSame('/cgi-bin/media/get', $path);
+    }
+
+    public function test_getRequestMethod_returnsGet(): void
+    {
+        $method = $this->request->getRequestMethod();
+        
+        $this->assertSame('GET', $method);
+    }
+
+    public function test_setMediaId_setsMediaIdCorrectly(): void
+    {
         $mediaId = 'test_media_id_123';
+        $this->request->setMediaId($mediaId);
         
-        $request->setAgent($agent);
-        $request->setMediaId($mediaId);
+        $this->assertSame($mediaId, $this->request->getMediaId());
+    }
+
+    public function test_getMediaId_returnsSetMediaId(): void
+    {
+        $mediaId = 'another_media_id_456';
+        $this->request->setMediaId($mediaId);
         
-        // 测试请求路径
-        $this->assertEquals('/cgi-bin/media/get', $request->getRequestPath());
+        $result = $this->request->getMediaId();
         
-        // 测试请求方法
-        $this->assertEquals('GET', $request->getRequestMethod());
+        $this->assertSame($mediaId, $result);
+    }
+
+    public function test_getRequestOptions_withMediaId(): void
+    {
+        $mediaId = 'test_media_id_789';
+        $this->request->setMediaId($mediaId);
         
-        // 测试查询参数
-        $options = $request->getRequestOptions();
+        $options = $this->request->getRequestOptions();
+        
         $this->assertIsArray($options);
         $this->assertArrayHasKey('query', $options);
-        $this->assertIsArray($options['query']);
         $this->assertArrayHasKey('media_id', $options['query']);
-        $this->assertEquals($mediaId, $options['query']['media_id']);
+        $this->assertSame($mediaId, $options['query']['media_id']);
+    }
+
+    public function test_setAgent_setsAgentCorrectly(): void
+    {
+        $this->request->setAgent($this->agent);
         
-        // 测试 Getter
-        $this->assertEquals($mediaId, $request->getMediaId());
+        $this->assertSame($this->agent, $this->request->getAgent());
+    }
+
+    public function test_getAgent_returnsSetAgent(): void
+    {
+        $this->request->setAgent($this->agent);
+        
+        $result = $this->request->getAgent();
+        
+        $this->assertSame($this->agent, $result);
     }
 } 

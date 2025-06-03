@@ -13,7 +13,7 @@ use Tourze\EasyAdmin\Attribute\Action\Editable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
-use WechatWorkBundle\Entity\Agent;
+use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkMediaBundle\Enum\MediaType;
 use WechatWorkMediaBundle\Repository\TempMediaRepository;
 
@@ -57,7 +57,7 @@ class TempMedia
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    private ?Agent $agent = null;
+    private ?AgentInterface $agent = null;
 
     public function getId(): ?string
     {
@@ -136,12 +136,12 @@ class TempMedia
         return $this;
     }
 
-    public function getAgent(): ?Agent
+    public function getAgent(): ?AgentInterface
     {
         return $this->agent;
     }
 
-    public function setAgent(?Agent $agent): static
+    public function setAgent(?AgentInterface $agent): static
     {
         $this->agent = $agent;
 

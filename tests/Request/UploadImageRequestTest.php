@@ -5,16 +5,16 @@ namespace WechatWorkMediaBundle\Tests\Request;
 use HttpClientBundle\Request\ApiRequest;
 use PHPUnit\Framework\TestCase;
 use WechatWorkBundle\Entity\Agent;
-use WechatWorkMediaBundle\Request\UploadRequest;
+use WechatWorkMediaBundle\Request\UploadImageRequest;
 
-class UploadRequestTest extends TestCase
+class UploadImageRequestTest extends TestCase
 {
-    private UploadRequest $request;
+    private UploadImageRequest $request;
     private Agent $agent;
 
     protected function setUp(): void
     {
-        $this->request = new UploadRequest();
+        $this->request = new UploadImageRequest();
         /** @var Agent $agent */
         $agent = $this->createMock(Agent::class);
         $this->agent = $agent;
@@ -29,7 +29,7 @@ class UploadRequestTest extends TestCase
     {
         $path = $this->request->getRequestPath();
         
-        $this->assertSame('/cgi-bin/media/upload', $path);
+        $this->assertSame('/cgi-bin/media/uploadimg', $path);
     }
 
     public function test_getRequestMethod_returnsPost(): void
@@ -39,27 +39,9 @@ class UploadRequestTest extends TestCase
         $this->assertSame('POST', $method);
     }
 
-    public function test_setType_setsTypeCorrectly(): void
-    {
-        $type = 'video';
-        $this->request->setType($type);
-        
-        $this->assertSame($type, $this->request->getType());
-    }
-
-    public function test_getType_returnsSetType(): void
-    {
-        $type = 'voice';
-        $this->request->setType($type);
-        
-        $result = $this->request->getType();
-        
-        $this->assertSame($type, $result);
-    }
-
     public function test_setPath_setsPathCorrectly(): void
     {
-        $path = '/tmp/test_video.mp4';
+        $path = '/tmp/test_image.png';
         $this->request->setPath($path);
         
         $this->assertSame($path, $this->request->getPath());
@@ -67,7 +49,7 @@ class UploadRequestTest extends TestCase
 
     public function test_getPath_returnsSetPath(): void
     {
-        $path = '/tmp/another_test_file.wav';
+        $path = '/tmp/another_image.jpg';
         $this->request->setPath($path);
         
         $result = $this->request->getPath();
@@ -91,29 +73,22 @@ class UploadRequestTest extends TestCase
         $this->assertSame($this->agent, $result);
     }
 
-    public function test_getRequestOptions_withFileUpload(): void
+    public function test_getRequestOptions_withImageUpload(): void
     {
-        $type = 'image';
+        // 创建临时图片文件进行测试
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_image');
+        file_put_contents($tempFile, 'fake image content');
         
-        // 创建临时文件进行测试
-        $tempFile = tempnam(sys_get_temp_dir(), 'test_upload');
-        file_put_contents($tempFile, 'test image content');
-        
-        $this->request->setType($type);
         $this->request->setPath($tempFile);
         
         $options = $this->request->getRequestOptions();
         
         $this->assertIsArray($options);
         $this->assertArrayHasKey('multipart', $options);
-        $this->assertArrayHasKey('query', $options);
         $this->assertArrayHasKey('headers', $options);
         
-        // 检查 query 参数
-        $this->assertSame($type, $options['query']['type']);
-        
         // 检查 headers
-        $this->assertSame('multipart/form-data', $options['headers']['Content-Type']);
+        $this->assertSame('image/png', $options['headers']['Content-Type']);
         
         // 检查 multipart 数据
         $this->assertArrayHasKey('name', $options['multipart']);
@@ -128,14 +103,11 @@ class UploadRequestTest extends TestCase
 
     public function test_allPropertiesWorkTogether(): void
     {
-        $type = 'file';
-        $path = '/tmp/document.pdf';
+        $path = '/tmp/image.png';
         
-        $this->request->setType($type);
         $this->request->setPath($path);
         $this->request->setAgent($this->agent);
         
-        $this->assertSame($type, $this->request->getType());
         $this->assertSame($path, $this->request->getPath());
         $this->assertSame($this->agent, $this->request->getAgent());
     }

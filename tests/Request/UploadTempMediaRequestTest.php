@@ -2,6 +2,7 @@
 
 namespace WechatWorkMediaBundle\Tests\Request;
 
+use HttpClientBundle\Request\ApiRequest;
 use PHPUnit\Framework\TestCase;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkMediaBundle\Enum\MediaType;
@@ -9,30 +10,120 @@ use WechatWorkMediaBundle\Request\UploadTempMediaRequest;
 
 class UploadTempMediaRequestTest extends TestCase
 {
-    /**
-     * 测试 UploadTempMediaRequest 配置
-     * 
-     * 注意：此测试无法完全测试 UploadTempMediaRequest 的功能，因为它依赖于 fopen 函数
-     */
-    public function testRequestConfiguration(): void
+    private UploadTempMediaRequest $request;
+    private Agent $agent;
+
+    protected function setUp(): void
     {
-        $request = new UploadTempMediaRequest();
-        $agent = new Agent();
+        $this->request = new UploadTempMediaRequest();
+        /** @var Agent $agent */
+        $agent = $this->createMock(Agent::class);
+        $this->agent = $agent;
+    }
+
+    public function test_request_extendsApiRequest(): void
+    {
+        $this->assertInstanceOf(ApiRequest::class, $this->request);
+    }
+
+    public function test_getRequestPath_returnsCorrectPath(): void
+    {
+        $path = $this->request->getRequestPath();
+        
+        $this->assertSame('/cgi-bin/media/upload', $path);
+    }
+
+    public function test_setType_setsTypeCorrectly(): void
+    {
         $type = MediaType::IMAGE;
-        $mediaFile = __FILE__; // 使用当前文件作为测试文件
+        $this->request->setType($type);
         
-        $request->setAgent($agent);
-        $request->setType($type);
-        $request->setMediaFile($mediaFile);
+        $this->assertSame($type, $this->request->getType());
+    }
+
+    public function test_getType_returnsSetType(): void
+    {
+        $type = MediaType::VIDEO;
+        $this->request->setType($type);
         
-        // 测试请求路径
-        $this->assertEquals('/cgi-bin/media/upload', $request->getRequestPath());
+        $result = $this->request->getType();
         
-        // 由于我们无法直接测试 getRequestOptions 方法（它会尝试打开文件），我们可以跳过这部分测试
-        $this->markTestSkipped('无法直接测试 getRequestOptions 方法，因为它会尝试使用 fopen 打开文件');
+        $this->assertSame($type, $result);
+    }
+
+    public function test_setMediaFile_setsMediaFileCorrectly(): void
+    {
+        $mediaFile = '/tmp/test_file.jpg';
+        $this->request->setMediaFile($mediaFile);
         
-        // 测试 Getter
-        $this->assertSame($type, $request->getType());
-        $this->assertEquals($mediaFile, $request->getMediaFile());
+        $this->assertSame($mediaFile, $this->request->getMediaFile());
+    }
+
+    public function test_getMediaFile_returnsSetMediaFile(): void
+    {
+        $mediaFile = '/tmp/another_test_file.mp4';
+        $this->request->setMediaFile($mediaFile);
+        
+        $result = $this->request->getMediaFile();
+        
+        $this->assertSame($mediaFile, $result);
+    }
+
+    public function test_setAgent_setsAgentCorrectly(): void
+    {
+        $this->request->setAgent($this->agent);
+        
+        $this->assertSame($this->agent, $this->request->getAgent());
+    }
+
+    public function test_getAgent_returnsSetAgent(): void
+    {
+        $this->request->setAgent($this->agent);
+        
+        $result = $this->request->getAgent();
+        
+        $this->assertSame($this->agent, $result);
+    }
+
+    public function test_getRequestOptions_withTypeAndMediaFile(): void
+    {
+        $type = MediaType::FILE;
+        $mediaFile = '/tmp/document.pdf';
+        
+        $this->request->setType($type);
+        $this->request->setMediaFile($mediaFile);
+        
+        // 这里我们需要创建一个临时文件来测试
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_media');
+        file_put_contents($tempFile, 'test content');
+        $this->request->setMediaFile($tempFile);
+        
+        $options = $this->request->getRequestOptions();
+        
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('query', $options);
+        $this->assertArrayHasKey('body', $options);
+        $this->assertArrayHasKey('type', $options['query']);
+        $this->assertSame($type->value, $options['query']['type']);
+        $this->assertArrayHasKey('media', $options['body']);
+        $this->assertIsResource($options['body']['media']);
+        
+        // 清理临时文件
+        fclose($options['body']['media']);
+        unlink($tempFile);
+    }
+
+    public function test_allPropertiesWorkTogether(): void
+    {
+        $type = MediaType::VOICE;
+        $mediaFile = '/tmp/audio.wav';
+        
+        $this->request->setType($type);
+        $this->request->setMediaFile($mediaFile);
+        $this->request->setAgent($this->agent);
+        
+        $this->assertSame($type, $this->request->getType());
+        $this->assertSame($mediaFile, $this->request->getMediaFile());
+        $this->assertSame($this->agent, $this->request->getAgent());
     }
 } 

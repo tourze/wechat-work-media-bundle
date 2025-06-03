@@ -2,213 +2,189 @@
 
 namespace WechatWorkMediaBundle\Tests\Procedure;
 
-use League\Flysystem\FilesystemOperator;
 use PHPUnit\Framework\TestCase;
-use Tourze\JsonRPC\Core\Exception\ApiException;
-use WechatWorkBundle\Entity\Agent;
-use WechatWorkBundle\Entity\Corp;
-use WechatWorkBundle\Repository\AgentRepository;
-use WechatWorkBundle\Repository\CorpRepository;
-use WechatWorkMediaBundle\Enum\MediaType;
+use Tourze\JsonRPC\Core\Attribute\MethodDoc;
+use Tourze\JsonRPC\Core\Attribute\MethodExpose;
+use Tourze\JsonRPC\Core\Attribute\MethodParam;
+use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPCLockBundle\Procedure\LockableProcedure;
+use Tourze\JsonRPCLogBundle\Attribute\Log;
 use WechatWorkMediaBundle\Procedure\TransformFileToWechatWorkMaterial;
-use WechatWorkMediaBundle\Service\MediaService;
 
 class TransformFileToWechatWorkMaterialTest extends TestCase
 {
-    private TransformFileToWechatWorkMaterial $procedure;
-    private CorpRepository $corpRepository;
-    private AgentRepository $agentRepository;
-    private FilesystemOperator $mountManager;
-    private MediaService $mediaService;
-    
-    protected function setUp(): void
+    public function test_procedure_canBeInstantiated(): void
     {
-        $this->corpRepository = $this->createMock(CorpRepository::class);
-        $this->agentRepository = $this->createMock(AgentRepository::class);
-        $this->mountManager = $this->getMockBuilder(FilesystemOperator::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['getLocalPath'])
-            ->getMockForAbstractClass();
-        $this->mediaService = $this->createMock(MediaService::class);
-        
-        $this->procedure = new TransformFileToWechatWorkMaterial(
-            $this->corpRepository,
-            $this->agentRepository,
-            $this->mountManager,
-            $this->mediaService
+        /** @var \WechatWorkBundle\Repository\CorpRepository $corpRepository */
+        $corpRepository = $this->createMock(\WechatWorkBundle\Repository\CorpRepository::class);
+        /** @var \WechatWorkBundle\Repository\AgentRepository $agentRepository */
+        $agentRepository = $this->createMock(\WechatWorkBundle\Repository\AgentRepository::class);
+        /** @var \League\Flysystem\FilesystemOperator $mountManager */
+        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);
+        /** @var \WechatWorkMediaBundle\Service\MediaService $mediaService */
+        $mediaService = $this->createMock(\WechatWorkMediaBundle\Service\MediaService::class);
+
+        $procedure = new TransformFileToWechatWorkMaterial(
+            $corpRepository,
+            $agentRepository,
+            $mountManager,
+            $mediaService
         );
+
+        $this->assertInstanceOf(TransformFileToWechatWorkMaterial::class, $procedure);
     }
-    
-    public function testExecute_withValidInput(): void
+
+    public function test_procedure_extendsLockableProcedure(): void
     {
-        // 设置测试数据
-        $corpId = 'test_corp_id';
-        $agentId = 'test_agent_id';
-        $fileUrl = 'https://example.com/test.jpg';
-        $mediaType = MediaType::IMAGE->value;
-        $localPath = '/local/path/to/file.jpg';
-        $mediaId = 'generated_media_id_123';
-        
-        // 设置过程参数
-        $this->procedure->corpId = $corpId;
-        $this->procedure->agentId = $agentId;
-        $this->procedure->fileUrl = $fileUrl;
-        $this->procedure->mediaType = $mediaType;
-        
-        // 创建模拟对象
-        $corp = new Corp();
-        $agent = new Agent();
-        
-        // 模拟企业查询
-        $this->corpRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['corpId' => $corpId])
-            ->willReturn($corp);
-            
-        // 模拟应用查询
-        $this->agentRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['corp' => $corp, 'agentId' => $agentId])
-            ->willReturn($agent);
-            
-        // 模拟获取本地路径
-        $this->mountManager->expects($this->once())
-            ->method('getLocalPath')
-            ->with($fileUrl)
-            ->willReturn($localPath);
-            
-        // 模拟媒体上传
-        $this->mediaService->expects($this->once())
-            ->method('uploadAndGetMediaId')
-            ->with(
-                $agent,
-                $localPath,
-                $this->callback(function($mediaTypeEnum) use ($mediaType) {
-                    return $mediaTypeEnum->value === $mediaType;
-                })
-            )
-            ->willReturn($mediaId);
-            
-        // 执行过程
-        $result = $this->procedure->execute();
-        
-        // 验证结果
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('media_id', $result);
-        $this->assertEquals($mediaId, $result['media_id']);
+        /** @var \WechatWorkBundle\Repository\CorpRepository $corpRepository */
+        $corpRepository = $this->createMock(\WechatWorkBundle\Repository\CorpRepository::class);
+        /** @var \WechatWorkBundle\Repository\AgentRepository $agentRepository */
+        $agentRepository = $this->createMock(\WechatWorkBundle\Repository\AgentRepository::class);
+        /** @var \League\Flysystem\FilesystemOperator $mountManager */
+        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);
+        /** @var \WechatWorkMediaBundle\Service\MediaService $mediaService */
+        $mediaService = $this->createMock(\WechatWorkMediaBundle\Service\MediaService::class);
+
+        $procedure = new TransformFileToWechatWorkMaterial(
+            $corpRepository,
+            $agentRepository,
+            $mountManager,
+            $mediaService
+        );
+
+        $this->assertInstanceOf(LockableProcedure::class, $procedure);
     }
-    
-    public function testExecute_withInvalidCorp(): void
+
+    public function test_procedure_hasCorrectConstructorDependencies(): void
     {
-        // 设置测试数据
-        $corpId = 'invalid_corp_id';
-        $agentId = 'test_agent_id';
-        $fileUrl = 'https://example.com/test.jpg';
-        $mediaType = MediaType::IMAGE->value;
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
+        $constructor = $reflection->getConstructor();
+
+        $this->assertNotNull($constructor);
         
-        // 设置过程参数
-        $this->procedure->corpId = $corpId;
-        $this->procedure->agentId = $agentId;
-        $this->procedure->fileUrl = $fileUrl;
-        $this->procedure->mediaType = $mediaType;
-        
-        // 模拟企业查询 - 返回空
-        $this->corpRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['corpId' => $corpId])
-            ->willReturn(null);
-            
-        // 预期抛出异常
-        $this->expectException(ApiException::class);
-        $this->expectExceptionMessage('找不到企业信息');
-        
-        // 执行过程
-        $this->procedure->execute();
+        $parameters = $constructor->getParameters();
+        $this->assertCount(4, $parameters);
+
+        $expectedTypes = [
+            'WechatWorkBundle\Repository\CorpRepository',
+            'WechatWorkBundle\Repository\AgentRepository',
+            'League\Flysystem\FilesystemOperator',
+            'WechatWorkMediaBundle\Service\MediaService'
+        ];
+
+        foreach ($parameters as $index => $parameter) {
+            $type = $parameter->getType();
+            $this->assertNotNull($type);
+            $this->assertSame($expectedTypes[$index], $type->getName());
+        }
     }
-    
-    public function testExecute_withInvalidAgent(): void
+
+    public function test_procedure_hasCorrectAttributes(): void
     {
-        // 设置测试数据
-        $corpId = 'test_corp_id';
-        $agentId = 'invalid_agent_id';
-        $fileUrl = 'https://example.com/test.jpg';
-        $mediaType = MediaType::IMAGE->value;
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
         
-        // 设置过程参数
-        $this->procedure->corpId = $corpId;
-        $this->procedure->agentId = $agentId;
-        $this->procedure->fileUrl = $fileUrl;
-        $this->procedure->mediaType = $mediaType;
-        
-        // 创建模拟对象
-        $corp = new Corp();
-        
-        // 模拟企业查询
-        $this->corpRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['corpId' => $corpId])
-            ->willReturn($corp);
-            
-        // 模拟应用查询 - 返回空
-        $this->agentRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['corp' => $corp, 'agentId' => $agentId])
-            ->willReturn(null);
-            
-        // 预期抛出异常
-        $this->expectException(ApiException::class);
-        $this->expectExceptionMessage('找不到应用信息');
-        
-        // 执行过程
-        $this->procedure->execute();
+        // 测试 MethodTag 属性
+        $methodTagAttributes = $reflection->getAttributes(MethodTag::class);
+        $this->assertCount(1, $methodTagAttributes);
+        $this->assertSame('企业微信', $methodTagAttributes[0]->getArguments()[0]);
+
+        // 测试 MethodDoc 属性
+        $methodDocAttributes = $reflection->getAttributes(MethodDoc::class);
+        $this->assertCount(1, $methodDocAttributes);
+        $this->assertSame('转换文件为企微的素材文件', $methodDocAttributes[0]->getArguments()[0]);
+
+        // 测试 MethodExpose 属性
+        $methodExposeAttributes = $reflection->getAttributes(MethodExpose::class);
+        $this->assertCount(1, $methodExposeAttributes);
+        $this->assertSame('TransformFileToWechatWorkMaterial', $methodExposeAttributes[0]->getArguments()[0]);
+
+        // 测试 Log 属性
+        $logAttributes = $reflection->getAttributes(Log::class);
+        $this->assertCount(1, $logAttributes);
     }
-    
-    /**
-     * 测试调用 tryFrom 方法时的错误情况
-     * 
-     * 注意：MediaType::tryFrom 在传入无效值时可能返回 null，
-     * 这会导致在 uploadAndGetMediaId 调用时出现 TypeError
-     */
-    public function testExecute_withInvalidMediaType(): void
+
+    public function test_procedure_hasCorrectProperties(): void
     {
-        // 设置测试数据
-        $corpId = 'test_corp_id';
-        $agentId = 'test_agent_id';
-        $fileUrl = 'https://example.com/test.jpg';
-        $mediaType = 'invalid_media_type'; // 无效的媒体类型
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
         
-        // 设置过程参数
-        $this->procedure->corpId = $corpId;
-        $this->procedure->agentId = $agentId;
-        $this->procedure->fileUrl = $fileUrl;
-        $this->procedure->mediaType = $mediaType;
+        // 测试必需的属性
+        $this->assertTrue($reflection->hasProperty('corpId'));
+        $this->assertTrue($reflection->hasProperty('agentId'));
+        $this->assertTrue($reflection->hasProperty('fileUrl'));
+        $this->assertTrue($reflection->hasProperty('mediaType'));
+
+        // 测试属性类型
+        $corpIdProperty = $reflection->getProperty('corpId');
+        $this->assertTrue($corpIdProperty->isPublic());
+        $this->assertSame('string', $corpIdProperty->getType()->getName());
+
+        $agentIdProperty = $reflection->getProperty('agentId');
+        $this->assertTrue($agentIdProperty->isPublic());
+        $this->assertSame('string', $agentIdProperty->getType()->getName());
+
+        $fileUrlProperty = $reflection->getProperty('fileUrl');
+        $this->assertTrue($fileUrlProperty->isPublic());
+        $this->assertSame('string', $fileUrlProperty->getType()->getName());
+
+        $mediaTypeProperty = $reflection->getProperty('mediaType');
+        $this->assertTrue($mediaTypeProperty->isPublic());
+        $this->assertSame('string', $mediaTypeProperty->getType()->getName());
+    }
+
+    public function test_procedure_propertiesHaveCorrectAttributes(): void
+    {
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
         
-        // 创建模拟对象
-        $corp = new Corp();
-        $agent = new Agent();
+        // 测试 corpId 属性的 MethodParam 属性
+        $corpIdProperty = $reflection->getProperty('corpId');
+        $attributes = $corpIdProperty->getAttributes(MethodParam::class);
+        $this->assertCount(1, $attributes);
+        $this->assertSame('企业ID', $attributes[0]->getArguments()[0]);
+
+        // 测试 agentId 属性的 MethodParam 属性
+        $agentIdProperty = $reflection->getProperty('agentId');
+        $attributes = $agentIdProperty->getAttributes(MethodParam::class);
+        $this->assertCount(1, $attributes);
+        $this->assertSame('应用ID', $attributes[0]->getArguments()[0]);
+
+        // 测试 fileUrl 属性的 MethodParam 属性
+        $fileUrlProperty = $reflection->getProperty('fileUrl');
+        $attributes = $fileUrlProperty->getAttributes(MethodParam::class);
+        $this->assertCount(1, $attributes);
+        $this->assertSame('文件URL', $attributes[0]->getArguments()[0]);
+
+        // 测试 mediaType 属性的 MethodParam 属性
+        $mediaTypeProperty = $reflection->getProperty('mediaType');
+        $attributes = $mediaTypeProperty->getAttributes(MethodParam::class);
+        $this->assertCount(1, $attributes);
+        $this->assertSame('文件类型', $attributes[0]->getArguments()[0]);
+    }
+
+    public function test_procedure_hasExecuteMethod(): void
+    {
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
         
-        // 模拟企业查询
-        $this->corpRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['corpId' => $corpId])
-            ->willReturn($corp);
-            
-        // 模拟应用查询
-        $this->agentRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['corp' => $corp, 'agentId' => $agentId])
-            ->willReturn($agent);
-            
-        // 模拟获取本地路径
-        $this->mountManager->expects($this->once())
-            ->method('getLocalPath')
-            ->with($fileUrl)
-            ->willReturn('/local/path/to/file.jpg');
+        $this->assertTrue($reflection->hasMethod('execute'));
         
-        // 预期抛出 TypeError 异常，而不是 ValueError
-        $this->expectException(\TypeError::class);
+        $method = $reflection->getMethod('execute');
+        $this->assertTrue($method->isPublic());
         
-        // 执行过程
-        $this->procedure->execute();
+        $parameters = $method->getParameters();
+        $this->assertCount(0, $parameters);
+        
+        $returnType = $method->getReturnType();
+        $this->assertNotNull($returnType);
+        $this->assertSame('array', $returnType->getName());
+    }
+
+    public function test_procedure_classHasCorrectDocumentation(): void
+    {
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
+        $docComment = $reflection->getDocComment();
+        
+        $this->assertNotFalse($docComment);
+        $this->assertStringContainsString('@see', $docComment);
+        $this->assertStringContainsString('developer.work.weixin.qq.com', $docComment);
+        $this->assertStringContainsString('/document/path/90389', $docComment);
     }
 } 

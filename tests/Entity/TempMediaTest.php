@@ -3,94 +3,201 @@
 namespace WechatWorkMediaBundle\Tests\Entity;
 
 use PHPUnit\Framework\TestCase;
-use WechatWorkBundle\Entity\Agent;
+use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkMediaBundle\Entity\TempMedia;
 use WechatWorkMediaBundle\Enum\MediaType;
 
 class TempMediaTest extends TestCase
 {
-    public function testGettersAndSetters(): void
+    private TempMedia $tempMedia;
+    private AgentInterface $agent;
+
+    protected function setUp(): void
     {
-        $media = new TempMedia();
+        $this->tempMedia = new TempMedia();
+        /** @var AgentInterface $agent */
+        $agent = $this->createMock(AgentInterface::class);
+        $this->agent = $agent;
+    }
+
+    public function test_getId_returnsInitialNullValue(): void
+    {
+        $result = $this->tempMedia->getId();
         
-        // 测试创建时间
-        $createTime = new \DateTime();
-        $media->setCreateTime($createTime);
-        $this->assertSame($createTime, $media->getCreateTime());
+        $this->assertNull($result);
+    }
+
+    public function test_setCreateTime_setsCreateTimeCorrectly(): void
+    {
+        $createTime = new \DateTime('2024-01-01 12:00:00');
+        $result = $this->tempMedia->setCreateTime($createTime);
         
-        // 测试媒体类型
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertSame($createTime, $this->tempMedia->getCreateTime());
+    }
+
+    public function test_setCreateTime_withNull(): void
+    {
+        $result = $this->tempMedia->setCreateTime(null);
+        
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertNull($this->tempMedia->getCreateTime());
+    }
+
+    public function test_getCreateTime_returnsSetValue(): void
+    {
+        $createTime = new \DateTime('2024-01-01 12:00:00');
+        $this->tempMedia->setCreateTime($createTime);
+        
+        $result = $this->tempMedia->getCreateTime();
+        
+        $this->assertSame($createTime, $result);
+    }
+
+    public function test_setType_setsTypeCorrectly(): void
+    {
         $type = MediaType::IMAGE;
-        $media->setType($type);
-        $this->assertSame($type, $media->getType());
+        $result = $this->tempMedia->setType($type);
         
-        // 测试文件键
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertSame($type, $this->tempMedia->getType());
+    }
+
+    public function test_getType_returnsInitialNullValue(): void
+    {
+        $result = $this->tempMedia->getType();
+        
+        $this->assertNull($result);
+    }
+
+    public function test_setFileKey_setsFileKeyCorrectly(): void
+    {
         $fileKey = 'test_file_key_123';
-        $media->setFileKey($fileKey);
-        $this->assertEquals($fileKey, $media->getFileKey());
+        $result = $this->tempMedia->setFileKey($fileKey);
         
-        // 测试文件 URL
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertSame($fileKey, $this->tempMedia->getFileKey());
+    }
+
+    public function test_setFileKey_withNull(): void
+    {
+        $result = $this->tempMedia->setFileKey(null);
+        
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertNull($this->tempMedia->getFileKey());
+    }
+
+    public function test_getFileKey_returnsInitialNullValue(): void
+    {
+        $result = $this->tempMedia->getFileKey();
+        
+        $this->assertNull($result);
+    }
+
+    public function test_setFileUrl_setsFileUrlCorrectly(): void
+    {
         $fileUrl = 'https://example.com/test.jpg';
-        $media->setFileUrl($fileUrl);
-        $this->assertEquals($fileUrl, $media->getFileUrl());
+        $result = $this->tempMedia->setFileUrl($fileUrl);
         
-        // 测试媒体 ID
-        $mediaId = 'test_media_id_123';
-        $media->setMediaId($mediaId);
-        $this->assertEquals($mediaId, $media->getMediaId());
-        
-        // 测试过期时间
-        $expireTime = new \DateTime('+3 days');
-        $media->setExpireTime($expireTime);
-        $this->assertSame($expireTime, $media->getExpireTime());
-        
-        // 测试代理
-        $agent = new Agent();
-        $media->setAgent($agent);
-        $this->assertSame($agent, $media->getAgent());
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertSame($fileUrl, $this->tempMedia->getFileUrl());
     }
-    
-    /**
-     * 测试所有枚举媒体类型
-     */
-    public function testAllMediaTypes(): void
+
+    public function test_setFileUrl_withNull(): void
     {
-        $media = new TempMedia();
+        $result = $this->tempMedia->setFileUrl(null);
         
-        // 测试所有有效的媒体类型
-        foreach ([MediaType::IMAGE, MediaType::VOICE, MediaType::VIDEO, MediaType::FILE] as $type) {
-            $media->setType($type);
-            $this->assertSame($type, $media->getType());
-        }
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertNull($this->tempMedia->getFileUrl());
     }
-    
-    /**
-     * 测试设置空值
-     */
-    public function testNullableFields(): void
+
+    public function test_getFileUrl_returnsInitialNullValue(): void
     {
-        $media = new TempMedia();
+        $result = $this->tempMedia->getFileUrl();
         
-        // ID 通常不应为空，但如果未设置则默认为 null
-        $this->assertNull($media->getId());
+        $this->assertNull($result);
+    }
+
+    public function test_setMediaId_setsMediaIdCorrectly(): void
+    {
+        $mediaId = 'media_id_456';
+        $result = $this->tempMedia->setMediaId($mediaId);
         
-        // 创建时间可为空
-        $media->setCreateTime(null);
-        $this->assertNull($media->getCreateTime());
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertSame($mediaId, $this->tempMedia->getMediaId());
+    }
+
+    public function test_setExpireTime_setsExpireTimeCorrectly(): void
+    {
+        $expireTime = new \DateTime('2024-01-04 12:00:00');
+        $result = $this->tempMedia->setExpireTime($expireTime);
         
-        // 文件键可为空
-        $media->setFileKey(null);
-        $this->assertNull($media->getFileKey());
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertSame($expireTime, $this->tempMedia->getExpireTime());
+    }
+
+    public function test_setExpireTime_withNull(): void
+    {
+        $result = $this->tempMedia->setExpireTime(null);
         
-        // 文件 URL 可为空
-        $media->setFileUrl(null);
-        $this->assertNull($media->getFileUrl());
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertNull($this->tempMedia->getExpireTime());
+    }
+
+    public function test_getExpireTime_returnsInitialNullValue(): void
+    {
+        $result = $this->tempMedia->getExpireTime();
         
-        // 过期时间可为空
-        $media->setExpireTime(null);
-        $this->assertNull($media->getExpireTime());
+        $this->assertNull($result);
+    }
+
+    public function test_setAgent_setsAgentCorrectly(): void
+    {
+        $result = $this->tempMedia->setAgent($this->agent);
         
-        // Agent 可为空
-        $media->setAgent(null);
-        $this->assertNull($media->getAgent());
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertSame($this->agent, $this->tempMedia->getAgent());
+    }
+
+    public function test_setAgent_withNull(): void
+    {
+        $result = $this->tempMedia->setAgent(null);
+        
+        $this->assertSame($this->tempMedia, $result);
+        $this->assertNull($this->tempMedia->getAgent());
+    }
+
+    public function test_getAgent_returnsInitialNullValue(): void
+    {
+        $result = $this->tempMedia->getAgent();
+        
+        $this->assertNull($result);
+    }
+
+    public function test_entityProperties_workTogether(): void
+    {
+        $createTime = new \DateTime('2024-01-01 12:00:00');
+        $expireTime = new \DateTime('2024-01-04 12:00:00');
+        $type = MediaType::VIDEO;
+        $fileKey = 'file_key_789';
+        $fileUrl = 'https://example.com/video.mp4';
+        $mediaId = 'media_id_789';
+
+        $this->tempMedia
+            ->setCreateTime($createTime)
+            ->setType($type)
+            ->setFileKey($fileKey)
+            ->setFileUrl($fileUrl)
+            ->setMediaId($mediaId)
+            ->setExpireTime($expireTime)
+            ->setAgent($this->agent);
+
+        $this->assertSame($createTime, $this->tempMedia->getCreateTime());
+        $this->assertSame($type, $this->tempMedia->getType());
+        $this->assertSame($fileKey, $this->tempMedia->getFileKey());
+        $this->assertSame($fileUrl, $this->tempMedia->getFileUrl());
+        $this->assertSame($mediaId, $this->tempMedia->getMediaId());
+        $this->assertSame($expireTime, $this->tempMedia->getExpireTime());
+        $this->assertSame($this->agent, $this->tempMedia->getAgent());
     }
 } 
