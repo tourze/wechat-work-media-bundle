@@ -58,7 +58,7 @@ class WechatWorkMediaExtensionTest extends TestCase
         
         try {
             $extension->load([], $container);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             // 如果服务配置文件不存在，这是正常的，不应该中断测试
             if (str_contains($e->getMessage(), 'services.yaml')) {
                 $this->expectNotToPerformAssertions();
