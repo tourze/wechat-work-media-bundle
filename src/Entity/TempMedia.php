@@ -7,26 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkMediaBundle\Enum\MediaType;
 use WechatWorkMediaBundle\Repository\TempMediaRepository;
 
-#[AsPermission(title: '临时素材')]
-#[Deletable]
-#[Editable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: TempMediaRepository::class)]
 #[ORM\Table(name: 'wechat_work_temp_media', options: ['comment' => '临时素材'])]
 class TempMedia
 {
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -34,8 +22,6 @@ class TempMedia
     private ?string $id = null;
 
     #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
     #[CreateTimeColumn]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
     private ?\DateTimeInterface $createTime = null;
