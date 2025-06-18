@@ -15,9 +15,7 @@ class MediaGetRequestTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->request = new MediaGetRequest();
-        /** @var Agent $agent */
-        $agent = $this->createMock(Agent::class);
+        $this->request = new MediaGetRequest();        $agent = $this->createMock(Agent::class);
         $this->agent = $agent;
     }
 
@@ -69,8 +67,6 @@ class MediaGetRequestTest extends TestCase
         $this->request->setMediaId($mediaId);
         
         $options = $this->request->getRequestOptions();
-        
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('query', $options);
         $this->assertArrayHasKey('media_id', $options['query']);
         $this->assertSame($mediaId, $options['query']['media_id']);

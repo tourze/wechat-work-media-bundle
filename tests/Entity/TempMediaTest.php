@@ -14,9 +14,7 @@ class TempMediaTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tempMedia = new TempMedia();
-        /** @var AgentInterface $agent */
-        $agent = $this->createMock(AgentInterface::class);
+        $this->tempMedia = new TempMedia();        $agent = $this->createMock(AgentInterface::class);
         $this->agent = $agent;
     }
 

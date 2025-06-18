@@ -15,9 +15,7 @@ class UploadTempMediaRequestTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->request = new UploadTempMediaRequest();
-        /** @var Agent $agent */
-        $agent = $this->createMock(Agent::class);
+        $this->request = new UploadTempMediaRequest();        $agent = $this->createMock(Agent::class);
         $this->agent = $agent;
     }
 
@@ -99,8 +97,6 @@ class UploadTempMediaRequestTest extends TestCase
         $this->request->setMediaFile($tempFile);
         
         $options = $this->request->getRequestOptions();
-        
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('query', $options);
         $this->assertArrayHasKey('body', $options);
         $this->assertArrayHasKey('type', $options['query']);

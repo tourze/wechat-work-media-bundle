@@ -9,13 +9,9 @@ class MediaServiceTest extends TestCase
 {
     public function test_mediaService_canBeInstantiated(): void
     {
-        /** @var \Psr\SimpleCache\CacheInterface $cache */
         $cache = $this->createMock(\Psr\SimpleCache\CacheInterface::class);
-        /** @var \League\Flysystem\FilesystemOperator $mountManager */
         $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);
-        /** @var \Tourze\TempFileBundle\Service\TemporaryFileService $temporaryFileService */
         $temporaryFileService = $this->createMock(\Tourze\TempFileBundle\Service\TemporaryFileService::class);
-        /** @var \WechatWorkBundle\Service\WorkService $workService */
         $workService = $this->createMock(\WechatWorkBundle\Service\WorkService::class);
 
         $mediaService = new MediaService(
@@ -34,7 +30,7 @@ class MediaServiceTest extends TestCase
         $constructor = $reflection->getConstructor();
 
         $this->assertNotNull($constructor);
-        
+
         $parameters = $constructor->getParameters();
         $this->assertCount(4, $parameters);
 
@@ -55,7 +51,7 @@ class MediaServiceTest extends TestCase
     public function test_mediaService_hasRequiredMethods(): void
     {
         $reflection = new \ReflectionClass(MediaService::class);
-        
+
         $this->assertTrue($reflection->hasMethod('uploadAndGetMediaId'));
         $this->assertTrue($reflection->hasMethod('downloadMedia'));
 
@@ -71,16 +67,16 @@ class MediaServiceTest extends TestCase
     public function test_mediaService_methodDocumentation(): void
     {
         $reflection = new \ReflectionClass(MediaService::class);
-        
+
         $uploadMethod = $reflection->getMethod('uploadAndGetMediaId');
         $docComment = $uploadMethod->getDocComment();
-        
+
         $this->assertNotFalse($docComment);
         $this->assertStringContainsString('@return string', $docComment);
         $this->assertStringContainsString('@throws', $docComment);
-        
+
         $downloadMethod = $reflection->getMethod('downloadMedia');
         $this->assertTrue($downloadMethod->hasReturnType());
         $this->assertSame('string', $downloadMethod->getReturnType()->getName());
     }
-} 
+}

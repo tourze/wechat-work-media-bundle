@@ -14,15 +14,7 @@ use WechatWorkMediaBundle\Procedure\TransformFileToWechatWorkMaterial;
 class TransformFileToWechatWorkMaterialTest extends TestCase
 {
     public function test_procedure_canBeInstantiated(): void
-    {
-        /** @var \WechatWorkBundle\Repository\CorpRepository $corpRepository */
-        $corpRepository = $this->createMock(\WechatWorkBundle\Repository\CorpRepository::class);
-        /** @var \WechatWorkBundle\Repository\AgentRepository $agentRepository */
-        $agentRepository = $this->createMock(\WechatWorkBundle\Repository\AgentRepository::class);
-        /** @var \League\Flysystem\FilesystemOperator $mountManager */
-        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);
-        /** @var \WechatWorkMediaBundle\Service\MediaService $mediaService */
-        $mediaService = $this->createMock(\WechatWorkMediaBundle\Service\MediaService::class);
+    {        $corpRepository = $this->createMock(\WechatWorkBundle\Repository\CorpRepository::class);        $agentRepository = $this->createMock(\WechatWorkBundle\Repository\AgentRepository::class);        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);        $mediaService = $this->createMock(\WechatWorkMediaBundle\Service\MediaService::class);
 
         $procedure = new TransformFileToWechatWorkMaterial(
             $corpRepository,
@@ -35,15 +27,7 @@ class TransformFileToWechatWorkMaterialTest extends TestCase
     }
 
     public function test_procedure_extendsLockableProcedure(): void
-    {
-        /** @var \WechatWorkBundle\Repository\CorpRepository $corpRepository */
-        $corpRepository = $this->createMock(\WechatWorkBundle\Repository\CorpRepository::class);
-        /** @var \WechatWorkBundle\Repository\AgentRepository $agentRepository */
-        $agentRepository = $this->createMock(\WechatWorkBundle\Repository\AgentRepository::class);
-        /** @var \League\Flysystem\FilesystemOperator $mountManager */
-        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);
-        /** @var \WechatWorkMediaBundle\Service\MediaService $mediaService */
-        $mediaService = $this->createMock(\WechatWorkMediaBundle\Service\MediaService::class);
+    {        $corpRepository = $this->createMock(\WechatWorkBundle\Repository\CorpRepository::class);        $agentRepository = $this->createMock(\WechatWorkBundle\Repository\AgentRepository::class);        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);        $mediaService = $this->createMock(\WechatWorkMediaBundle\Service\MediaService::class);
 
         $procedure = new TransformFileToWechatWorkMaterial(
             $corpRepository,

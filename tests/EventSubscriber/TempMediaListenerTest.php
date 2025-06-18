@@ -11,13 +11,7 @@ use WechatWorkMediaBundle\EventSubscriber\TempMediaListener;
 class TempMediaListenerTest extends TestCase
 {
     public function test_listener_canBeInstantiated(): void
-    {
-        /** @var \WechatWorkBundle\Service\WorkService $workService */
-        $workService = $this->createMock(\WechatWorkBundle\Service\WorkService::class);
-        /** @var \League\Flysystem\FilesystemOperator $mountManager */
-        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);
-        /** @var \Tourze\TempFileBundle\Service\TemporaryFileService $temporaryFileService */
-        $temporaryFileService = $this->createMock(\Tourze\TempFileBundle\Service\TemporaryFileService::class);
+    {        $workService = $this->createMock(\WechatWorkBundle\Service\WorkService::class);        $mountManager = $this->createMock(\League\Flysystem\FilesystemOperator::class);        $temporaryFileService = $this->createMock(\Tourze\TempFileBundle\Service\TemporaryFileService::class);
 
         $listener = new TempMediaListener(
             $workService,

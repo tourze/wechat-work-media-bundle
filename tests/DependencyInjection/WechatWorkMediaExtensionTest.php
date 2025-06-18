@@ -76,7 +76,6 @@ class WechatWorkMediaExtensionTest extends TestCase
         $alias = $extension->getAlias();
         
         // Symfony Extension 基类会自动生成别名
-        $this->assertIsString($alias);
         $this->assertNotEmpty($alias);
     }
 

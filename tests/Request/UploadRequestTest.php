@@ -14,9 +14,7 @@ class UploadRequestTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->request = new UploadRequest();
-        /** @var Agent $agent */
-        $agent = $this->createMock(Agent::class);
+        $this->request = new UploadRequest();        $agent = $this->createMock(Agent::class);
         $this->agent = $agent;
     }
 
@@ -103,8 +101,6 @@ class UploadRequestTest extends TestCase
         $this->request->setPath($tempFile);
         
         $options = $this->request->getRequestOptions();
-        
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('multipart', $options);
         $this->assertArrayHasKey('query', $options);
         $this->assertArrayHasKey('headers', $options);

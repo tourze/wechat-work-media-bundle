@@ -10,18 +10,14 @@ use WechatWorkMediaBundle\Repository\TempMediaRepository;
 class TempMediaRepositoryTest extends TestCase
 {
     public function test_repository_extendsServiceEntityRepository(): void
-    {
-        /** @var ManagerRegistry $managerRegistry */
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+    {        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $repository = new TempMediaRepository($managerRegistry);
         
         $this->assertInstanceOf(ServiceEntityRepository::class, $repository);
     }
 
     public function test_repository_canBeInstantiated(): void
-    {
-        /** @var ManagerRegistry $managerRegistry */
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+    {        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $repository = new TempMediaRepository($managerRegistry);
         
         $this->assertInstanceOf(TempMediaRepository::class, $repository);
