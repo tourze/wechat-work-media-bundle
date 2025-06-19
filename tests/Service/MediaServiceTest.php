@@ -44,7 +44,7 @@ class MediaServiceTest extends TestCase
         foreach ($parameters as $index => $parameter) {
             $type = $parameter->getType();
             $this->assertNotNull($type);
-            $this->assertSame($expectedTypes[$index], $type->getName());
+            $this->assertSame($expectedTypes[$index], (string) $type);
         }
     }
 
@@ -77,6 +77,6 @@ class MediaServiceTest extends TestCase
 
         $downloadMethod = $reflection->getMethod('downloadMedia');
         $this->assertTrue($downloadMethod->hasReturnType());
-        $this->assertSame('string', $downloadMethod->getReturnType()->getName());
+        $this->assertSame('string', (string) $downloadMethod->getReturnType());
     }
 }

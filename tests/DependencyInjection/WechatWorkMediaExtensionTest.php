@@ -37,15 +37,15 @@ class WechatWorkMediaExtensionTest extends TestCase
         
         $configsParam = $parameters[0];
         $this->assertSame('configs', $configsParam->getName());
-        $this->assertSame('array', $configsParam->getType()->getName());
+        $this->assertSame('array', (string) $configsParam->getType());
         
         $containerParam = $parameters[1];
         $this->assertSame('container', $containerParam->getName());
-        $this->assertSame('Symfony\Component\DependencyInjection\ContainerBuilder', $containerParam->getType()->getName());
+        $this->assertSame('Symfony\Component\DependencyInjection\ContainerBuilder', (string) $containerParam->getType());
         
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertSame('void', $returnType->getName());
+        $this->assertSame('void', (string) $returnType);
     }
 
     public function test_extension_canLoadWithEmptyConfigs(): void

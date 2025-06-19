@@ -26,7 +26,7 @@ class TempMedia implements \Stringable
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '创建时间'])]
     private ?\DateTimeImmutable $createTime = null;
 
-    #[ORM\Column(length: 20, enumType: MediaType::class)]
+    #[ORM\Column(length: 20, enumType: MediaType::class, options: ['comment' => '媒体类型'])]
     private ?MediaType $type = null;
 
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '文件KEY'])]
@@ -38,7 +38,7 @@ class TempMedia implements \Stringable
     #[ORM\Column(length: 120, unique: true, options: ['comment' => '临时素材ID'])]
     private string $mediaId;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '过期时间'])]
     private ?\DateTimeImmutable $expireTime = null;
 
     #[ORM\ManyToOne]

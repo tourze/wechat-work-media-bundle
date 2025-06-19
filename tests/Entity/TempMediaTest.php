@@ -27,7 +27,7 @@ class TempMediaTest extends TestCase
 
     public function test_setCreateTime_setsCreateTimeCorrectly(): void
     {
-        $createTime = new \DateTime('2024-01-01 12:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-01 12:00:00');
         $result = $this->tempMedia->setCreateTime($createTime);
         
         $this->assertSame($this->tempMedia, $result);
@@ -44,7 +44,7 @@ class TempMediaTest extends TestCase
 
     public function test_getCreateTime_returnsSetValue(): void
     {
-        $createTime = new \DateTime('2024-01-01 12:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-01 12:00:00');
         $this->tempMedia->setCreateTime($createTime);
         
         $result = $this->tempMedia->getCreateTime();
@@ -127,7 +127,7 @@ class TempMediaTest extends TestCase
 
     public function test_setExpireTime_setsExpireTimeCorrectly(): void
     {
-        $expireTime = new \DateTime('2024-01-04 12:00:00');
+        $expireTime = new \DateTimeImmutable('2024-01-04 12:00:00');
         $result = $this->tempMedia->setExpireTime($expireTime);
         
         $this->assertSame($this->tempMedia, $result);
@@ -174,8 +174,8 @@ class TempMediaTest extends TestCase
 
     public function test_entityProperties_workTogether(): void
     {
-        $createTime = new \DateTime('2024-01-01 12:00:00');
-        $expireTime = new \DateTime('2024-01-04 12:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-01 12:00:00');
+        $expireTime = new \DateTimeImmutable('2024-01-04 12:00:00');
         $type = MediaType::VIDEO;
         $fileKey = 'file_key_789';
         $fileUrl = 'https://example.com/video.mp4';

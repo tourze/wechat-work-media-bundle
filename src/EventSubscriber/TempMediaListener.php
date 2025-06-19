@@ -29,11 +29,17 @@ class TempMediaListener
     public function prePersist(TempMedia $media): void
     {
         $request = new UploadTempMediaRequest();
-        $request->setAgent($media->getAgent());
+        if ($media->getAgent() instanceof \WechatWorkBundle\Entity\Agent) {
+            $request->setAgent($media->getAgent());
+        } else {
+            $request->setAgent(null);
+        }
         $request->setType($media->getType());
 
-        if ($media->getFileKey()) {
-            $localFile = $this->mountManager->getLocalPath($media->getFileKey());
+        if (!empty($media->getFileKey())) {
+            $localFile = $this->temporaryFileService->generateTemporaryFileName('wework_media');
+            $content = $this->mountManager->read($media->getFileKey());
+            file_put_contents($localFile, $content);
         } else {
             $localFile = $this->temporaryFileService->generateTemporaryFileName('wework_media');
             file_put_contents($localFile, file_get_contents($media->getFileUrl()));

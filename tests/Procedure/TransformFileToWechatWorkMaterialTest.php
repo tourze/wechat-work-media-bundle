@@ -59,7 +59,7 @@ class TransformFileToWechatWorkMaterialTest extends TestCase
         foreach ($parameters as $index => $parameter) {
             $type = $parameter->getType();
             $this->assertNotNull($type);
-            $this->assertSame($expectedTypes[$index], $type->getName());
+            $this->assertSame($expectedTypes[$index], (string) $type);
         }
     }
 
@@ -100,19 +100,19 @@ class TransformFileToWechatWorkMaterialTest extends TestCase
         // 测试属性类型
         $corpIdProperty = $reflection->getProperty('corpId');
         $this->assertTrue($corpIdProperty->isPublic());
-        $this->assertSame('string', $corpIdProperty->getType()->getName());
+        $this->assertSame('string', (string) $corpIdProperty->getType());
 
         $agentIdProperty = $reflection->getProperty('agentId');
         $this->assertTrue($agentIdProperty->isPublic());
-        $this->assertSame('string', $agentIdProperty->getType()->getName());
+        $this->assertSame('string', (string) $agentIdProperty->getType());
 
         $fileUrlProperty = $reflection->getProperty('fileUrl');
         $this->assertTrue($fileUrlProperty->isPublic());
-        $this->assertSame('string', $fileUrlProperty->getType()->getName());
+        $this->assertSame('string', (string) $fileUrlProperty->getType());
 
         $mediaTypeProperty = $reflection->getProperty('mediaType');
         $this->assertTrue($mediaTypeProperty->isPublic());
-        $this->assertSame('string', $mediaTypeProperty->getType()->getName());
+        $this->assertSame('string', (string) $mediaTypeProperty->getType());
     }
 
     public function test_procedure_propertiesHaveCorrectAttributes(): void
@@ -158,7 +158,7 @@ class TransformFileToWechatWorkMaterialTest extends TestCase
         
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertSame('array', $returnType->getName());
+        $this->assertSame('array', (string) $returnType);
     }
 
     public function test_procedure_classHasCorrectDocumentation(): void

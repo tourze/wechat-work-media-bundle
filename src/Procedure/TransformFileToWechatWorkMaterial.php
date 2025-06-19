@@ -51,7 +51,7 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
         $corp = $this->corpRepository->findOneBy([
             'corpId' => $this->corpId,
         ]);
-        if (!$corp) {
+        if (null === $corp) {
             throw new ApiException('找不到企业信息');
         }
 
@@ -59,12 +59,15 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
             'corp' => $corp,
             'agentId' => $this->agentId,
         ]);
-        if (!$agent) {
+        if (null === $agent) {
             throw new ApiException('找不到应用信息');
         }
 
         // 先转存文件到本地
-        $path = $this->mountManager->getLocalPath($this->fileUrl);
+        $tmpPath = tempnam(sys_get_temp_dir(), 'wework_material');
+        $content = $this->mountManager->read($this->fileUrl);
+        file_put_contents($tmpPath, $content);
+        $path = $tmpPath;
         // 保存成远程附件
         $mediaId = $this->mediaService->uploadAndGetMediaId($agent, $path, MediaType::tryFrom($this->mediaType));
 

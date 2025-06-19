@@ -61,7 +61,11 @@ class MediaService
         $request = new UploadRequest();
         $request->setType($type->value);
         $request->setPath($path);
-        $request->setAgent($agent);
+        if ($agent instanceof \WechatWorkBundle\Entity\Agent) {
+            $request->setAgent($agent);
+        } else {
+            $request->setAgent(null);
+        }
         $res = $this->workService->request($request);
         if (is_string($res)) {
             $res = Json::decode($res);
@@ -82,7 +86,11 @@ class MediaService
     public function downloadMedia(AgentInterface $agent, string $mediaId, ?string $ext = null): string
     {
         $request = new MediaGetRequest();
-        $request->setAgent($agent);
+        if ($agent instanceof \WechatWorkBundle\Entity\Agent) {
+            $request->setAgent($agent);
+        } else {
+            $request->setAgent(null);
+        }
         $request->setMediaId($mediaId);
         /** @var ResponseInterface $response */
         $response = $this->workService->request($request);
@@ -98,9 +106,11 @@ class MediaService
             $tmpName = $match[1];
         }
 
-        // 拼接一个 UploadFile 对象，然后模拟上传一次咯
-        $file = $this->mountManager->generateUploadFileFromPath($tmpPath, $tmpName);
+        // 使用写入替代扩展方法
+        $destinationPath = 'uploads/' . uniqid() . '_' . $tmpName;
+        $this->mountManager->writeStream($destinationPath, fopen($tmpPath, 'r'));
+        unlink($tmpPath);
 
-        return $this->mountManager->saveUploadFile($file)->getFileKey();
+        return $destinationPath;
     }
 }

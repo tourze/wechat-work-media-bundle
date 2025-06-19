@@ -41,7 +41,7 @@ class TempMediaListenerTest extends TestCase
         foreach ($parameters as $index => $parameter) {
             $type = $parameter->getType();
             $this->assertNotNull($type);
-            $this->assertSame($expectedTypes[$index], $type->getName());
+            $this->assertSame($expectedTypes[$index], (string) $type);
         }
     }
 
@@ -82,7 +82,7 @@ class TempMediaListenerTest extends TestCase
         
         $type = $parameter->getType();
         $this->assertNotNull($type);
-        $this->assertSame(TempMedia::class, $type->getName());
+        $this->assertSame(TempMedia::class, (string) $type);
     }
 
     public function test_listener_methodHasCorrectDocumentation(): void
