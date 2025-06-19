@@ -13,7 +13,7 @@ use WechatWorkMediaBundle\Repository\TempMediaRepository;
 
 #[ORM\Entity(repositoryClass: TempMediaRepository::class)]
 #[ORM\Table(name: 'wechat_work_temp_media', options: ['comment' => '临时素材'])]
-class TempMedia
+class TempMedia implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -23,8 +23,8 @@ class TempMedia
 
     #[IndexColumn]
     #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeImmutable $createTime = null;
 
     #[ORM\Column(length: 20, enumType: MediaType::class)]
     private ?MediaType $type = null;
@@ -38,8 +38,8 @@ class TempMedia
     #[ORM\Column(length: 120, unique: true, options: ['comment' => '临时素材ID'])]
     private string $mediaId;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $expireTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $expireTime = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
@@ -50,14 +50,14 @@ class TempMedia
         return $this->id;
     }
 
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
+    public function setCreateTime(?\DateTimeImmutable $createdAt): self
     {
         $this->createTime = $createdAt;
 
         return $this;
     }
 
-    public function getCreateTime(): ?\DateTimeInterface
+    public function getCreateTime(): ?\DateTimeImmutable
     {
         return $this->createTime;
     }
@@ -110,12 +110,12 @@ class TempMedia
         return $this;
     }
 
-    public function getExpireTime(): ?\DateTimeInterface
+    public function getExpireTime(): ?\DateTimeImmutable
     {
         return $this->expireTime;
     }
 
-    public function setExpireTime(?\DateTimeInterface $expireTime): static
+    public function setExpireTime(?\DateTimeImmutable $expireTime): static
     {
         $this->expireTime = $expireTime;
 
@@ -132,5 +132,10 @@ class TempMedia
         $this->agent = $agent;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }
