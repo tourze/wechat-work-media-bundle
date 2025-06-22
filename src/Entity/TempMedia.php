@@ -6,7 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkMediaBundle\Enum\MediaType;
 use WechatWorkMediaBundle\Repository\TempMediaRepository;
@@ -15,16 +15,13 @@ use WechatWorkMediaBundle\Repository\TempMediaRepository;
 #[ORM\Table(name: 'wechat_work_temp_media', options: ['comment' => '临时素材'])]
 class TempMedia implements \Stringable
 {
+    use CreateTimeAware;
+
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
-
-    #[IndexColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeImmutable $createTime = null;
 
     #[ORM\Column(length: 20, enumType: MediaType::class, options: ['comment' => '媒体类型'])]
     private ?MediaType $type = null;
@@ -48,18 +45,6 @@ class TempMedia implements \Stringable
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreateTime(?\DateTimeImmutable $createdAt): self
-    {
-        $this->createTime = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeImmutable
-    {
-        return $this->createTime;
     }
 
     public function getType(): ?MediaType
