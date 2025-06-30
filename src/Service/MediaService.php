@@ -98,7 +98,7 @@ class MediaService
         file_put_contents($tmpPath, $response->getContent());
 
         // 获取文件名
-        $tmpName = uniqid() . '.' . ($ext ?: 'raw');
+        $tmpName = uniqid() . '.' . ($ext ?? 'raw');
         $headers = $response->getHeaders();
         $headerValue = $headers['content-disposition'][0];
         if (preg_match('/attachment; filename="(.*?)"/i', $headerValue, $match)) {

@@ -18,22 +18,22 @@ use WechatWorkMediaBundle\Service\MediaService;
 /**
  * @see https://developer.work.weixin.qq.com/document/path/90389
  */
-#[MethodTag('企业微信')]
-#[MethodDoc('转换文件为企微的素材文件')]
-#[MethodExpose('TransformFileToWechatWorkMaterial')]
+#[MethodTag(name: '企业微信')]
+#[MethodDoc(summary: '转换文件为企微的素材文件')]
+#[MethodExpose(method: 'TransformFileToWechatWorkMaterial')]
 #[Log]
 class TransformFileToWechatWorkMaterial extends LockableProcedure
 {
-    #[MethodParam('企业ID')]
+    #[MethodParam(description: '企业ID')]
     public string $corpId;
 
-    #[MethodParam('应用ID')]
+    #[MethodParam(description: '应用ID')]
     public string $agentId;
 
-    #[MethodParam('文件URL')]
+    #[MethodParam(description: '文件URL')]
     public string $fileUrl;
 
-    #[MethodParam('文件类型')]
+    #[MethodParam(description: '文件类型')]
     public string $mediaType;
 
     public function __construct(

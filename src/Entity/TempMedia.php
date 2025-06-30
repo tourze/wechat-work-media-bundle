@@ -4,8 +4,7 @@ namespace WechatWorkMediaBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkMediaBundle\Enum\MediaType;
@@ -16,12 +15,7 @@ use WechatWorkMediaBundle\Repository\TempMediaRepository;
 class TempMedia implements \Stringable
 {
     use CreateTimeAware;
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     #[ORM\Column(length: 20, enumType: MediaType::class, options: ['comment' => '媒体类型'])]
     private ?MediaType $type = null;
@@ -41,11 +35,6 @@ class TempMedia implements \Stringable
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?AgentInterface $agent = null;
-
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getType(): ?MediaType
     {

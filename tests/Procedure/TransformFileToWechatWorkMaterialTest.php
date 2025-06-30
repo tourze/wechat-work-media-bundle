@@ -70,17 +70,17 @@ class TransformFileToWechatWorkMaterialTest extends TestCase
         // 测试 MethodTag 属性
         $methodTagAttributes = $reflection->getAttributes(MethodTag::class);
         $this->assertCount(1, $methodTagAttributes);
-        $this->assertSame('企业微信', $methodTagAttributes[0]->getArguments()[0]);
+        $this->assertSame('企业微信', $methodTagAttributes[0]->getArguments()['name']);
 
         // 测试 MethodDoc 属性
         $methodDocAttributes = $reflection->getAttributes(MethodDoc::class);
         $this->assertCount(1, $methodDocAttributes);
-        $this->assertSame('转换文件为企微的素材文件', $methodDocAttributes[0]->getArguments()[0]);
+        $this->assertSame('转换文件为企微的素材文件', $methodDocAttributes[0]->getArguments()['summary']);
 
         // 测试 MethodExpose 属性
         $methodExposeAttributes = $reflection->getAttributes(MethodExpose::class);
         $this->assertCount(1, $methodExposeAttributes);
-        $this->assertSame('TransformFileToWechatWorkMaterial', $methodExposeAttributes[0]->getArguments()[0]);
+        $this->assertSame('TransformFileToWechatWorkMaterial', $methodExposeAttributes[0]->getArguments()['method']);
 
         // 测试 Log 属性
         $logAttributes = $reflection->getAttributes(Log::class);
@@ -123,25 +123,25 @@ class TransformFileToWechatWorkMaterialTest extends TestCase
         $corpIdProperty = $reflection->getProperty('corpId');
         $attributes = $corpIdProperty->getAttributes(MethodParam::class);
         $this->assertCount(1, $attributes);
-        $this->assertSame('企业ID', $attributes[0]->getArguments()[0]);
+        $this->assertSame('企业ID', $attributes[0]->getArguments()['description']);
 
         // 测试 agentId 属性的 MethodParam 属性
         $agentIdProperty = $reflection->getProperty('agentId');
         $attributes = $agentIdProperty->getAttributes(MethodParam::class);
         $this->assertCount(1, $attributes);
-        $this->assertSame('应用ID', $attributes[0]->getArguments()[0]);
+        $this->assertSame('应用ID', $attributes[0]->getArguments()['description']);
 
         // 测试 fileUrl 属性的 MethodParam 属性
         $fileUrlProperty = $reflection->getProperty('fileUrl');
         $attributes = $fileUrlProperty->getAttributes(MethodParam::class);
         $this->assertCount(1, $attributes);
-        $this->assertSame('文件URL', $attributes[0]->getArguments()[0]);
+        $this->assertSame('文件URL', $attributes[0]->getArguments()['description']);
 
         // 测试 mediaType 属性的 MethodParam 属性
         $mediaTypeProperty = $reflection->getProperty('mediaType');
         $attributes = $mediaTypeProperty->getAttributes(MethodParam::class);
         $this->assertCount(1, $attributes);
-        $this->assertSame('文件类型', $attributes[0]->getArguments()[0]);
+        $this->assertSame('文件类型', $attributes[0]->getArguments()['description']);
     }
 
     public function test_procedure_hasExecuteMethod(): void
