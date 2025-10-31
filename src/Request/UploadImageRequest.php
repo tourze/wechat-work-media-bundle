@@ -24,6 +24,9 @@ class UploadImageRequest extends ApiRequest
         return '/cgi-bin/media/uploadimg';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         return [

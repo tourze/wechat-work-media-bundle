@@ -3,12 +3,43 @@ services:
   _defaults:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    public: false
 
-  WechatWorkMediaBundle\EventSubscriber\:
-    resource: '../../EventSubscriber/'
-  WechatWorkMediaBundle\Procedure\:
-    resource: '../../Procedure/'
+  # EventSubscriber with optional dependencies
+  WechatWorkMediaBundle\EventSubscriber\TempMediaListener:
+    arguments:
+      $workService: '@WechatWorkBundle\Service\WorkService'
+      $mountManager: '@?League\Flysystem\FilesystemOperator'
+      $temporaryFileService: '@Tourze\TempFileBundle\Service\TemporaryFileService'
+  
+  # Manual configuration for TransformFileToWechatWorkMaterial
+  WechatWorkMediaBundle\Procedure\TransformFileToWechatWorkMaterial:
+    arguments:
+      $corpRepository: '@WechatWorkBundle\Repository\CorpRepository'
+      $agentRepository: '@WechatWorkBundle\Repository\AgentRepository'
+      $mountManager: '@?League\Flysystem\FilesystemOperator'
+      $mediaService: '@WechatWorkMediaBundle\Service\MediaService'
+      
   WechatWorkMediaBundle\Repository\:
     resource: '../../Repository/'
-  WechatWorkMediaBundle\Service\:
-    resource: '../../Service/'
+    public: true
+
+  WechatWorkMediaBundle\Controller\:
+    resource: '../../Controller/'
+    autoconfigure: true
+    autowire: true
+    tags: ['controller.service_arguments']
+
+  WechatWorkMediaBundle\Service\AdminMenu:
+    autoconfigure: true
+    autowire: true
+    tags: ['tourze.easy_admin_menu.menu_provider']
+      
+  # Manual configuration for MediaService
+  WechatWorkMediaBundle\Service\MediaService:
+    arguments:
+      $cache: '@?Psr\SimpleCache\CacheInterface'
+      $mountManager: '@?League\Flysystem\FilesystemOperator'
+      $temporaryFileService: '@Tourze\TempFileBundle\Service\TemporaryFileService'
+      $workService: '@WechatWorkBundle\Service\WorkService'
+    public: true

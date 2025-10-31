@@ -30,6 +30,9 @@ class UploadTempMediaRequest extends ApiRequest
         return '/cgi-bin/media/upload';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $fileHandle = fopen($this->getMediaFile(), 'r');

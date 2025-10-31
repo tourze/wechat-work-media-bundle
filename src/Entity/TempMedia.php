@@ -4,9 +4,10 @@ namespace WechatWorkMediaBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\WechatWorkContracts\AgentInterface;
+use WechatWorkBundle\Entity\Agent;
 use WechatWorkMediaBundle\Enum\MediaType;
 use WechatWorkMediaBundle\Repository\TempMediaRepository;
 
@@ -18,34 +19,39 @@ class TempMedia implements \Stringable
     use SnowflakeKeyAware;
 
     #[ORM\Column(length: 20, enumType: MediaType::class, options: ['comment' => '媒体类型'])]
+    #[Assert\Choice(callback: [MediaType::class, 'cases'])]
     private ?MediaType $type = null;
 
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '文件KEY'])]
+    #[Assert\Length(max: 255)]
     private ?string $fileKey = null;
 
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '文件URL'])]
+    #[Assert\Length(max: 255)]
+    #[Assert\Url]
     private ?string $fileUrl = null;
 
     #[ORM\Column(length: 120, unique: true, options: ['comment' => '临时素材ID'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 120)]
     private string $mediaId;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '过期时间'])]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
     private ?\DateTimeImmutable $expireTime = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: Agent::class)]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    private ?AgentInterface $agent = null;
+    private ?Agent $agent = null;
 
     public function getType(): ?MediaType
     {
         return $this->type;
     }
 
-    public function setType(MediaType $type): static
+    public function setType(MediaType $type): void
     {
         $this->type = $type;
-
-        return $this;
     }
 
     public function getFileKey(): ?string
@@ -53,11 +59,9 @@ class TempMedia implements \Stringable
         return $this->fileKey;
     }
 
-    public function setFileKey(?string $fileKey): static
+    public function setFileKey(?string $fileKey): void
     {
         $this->fileKey = $fileKey;
-
-        return $this;
     }
 
     public function getFileUrl(): ?string
@@ -65,11 +69,9 @@ class TempMedia implements \Stringable
         return $this->fileUrl;
     }
 
-    public function setFileUrl(?string $fileUrl): static
+    public function setFileUrl(?string $fileUrl): void
     {
         $this->fileUrl = $fileUrl;
-
-        return $this;
     }
 
     public function getMediaId(): string
@@ -77,11 +79,9 @@ class TempMedia implements \Stringable
         return $this->mediaId;
     }
 
-    public function setMediaId(string $mediaId): static
+    public function setMediaId(string $mediaId): void
     {
         $this->mediaId = $mediaId;
-
-        return $this;
     }
 
     public function getExpireTime(): ?\DateTimeImmutable
@@ -89,23 +89,19 @@ class TempMedia implements \Stringable
         return $this->expireTime;
     }
 
-    public function setExpireTime(?\DateTimeImmutable $expireTime): static
+    public function setExpireTime(?\DateTimeImmutable $expireTime): void
     {
         $this->expireTime = $expireTime;
-
-        return $this;
     }
 
-    public function getAgent(): ?AgentInterface
+    public function getAgent(): ?Agent
     {
         return $this->agent;
     }
 
-    public function setAgent(?AgentInterface $agent): static
+    public function setAgent(?Agent $agent): void
     {
         $this->agent = $agent;
-
-        return $this;
     }
 
     public function __toString(): string

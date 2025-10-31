@@ -3,6 +3,7 @@
 namespace WechatWorkMediaBundle\Procedure;
 
 use League\Flysystem\FilesystemOperator;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -22,6 +23,7 @@ use WechatWorkMediaBundle\Service\MediaService;
 #[MethodDoc(summary: '转换文件为企微的素材文件')]
 #[MethodExpose(method: 'TransformFileToWechatWorkMaterial')]
 #[Log]
+#[Autoconfigure(public: true)]
 class TransformFileToWechatWorkMaterial extends LockableProcedure
 {
     #[MethodParam(description: '企业ID')]
@@ -39,7 +41,7 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
     public function __construct(
         private readonly CorpRepository $corpRepository,
         private readonly AgentRepository $agentRepository,
-        private readonly FilesystemOperator $mountManager,
+        private readonly ?FilesystemOperator $mountManager,
         private readonly MediaService $mediaService,
     ) {
     }
@@ -65,11 +67,19 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
 
         // 先转存文件到本地
         $tmpPath = tempnam(sys_get_temp_dir(), 'wework_material');
-        $content = $this->mountManager->read($this->fileUrl);
-        file_put_contents($tmpPath, $content);
+        if (null !== $this->mountManager) {
+            $content = $this->mountManager->read($this->fileUrl);
+            file_put_contents($tmpPath, $content);
+        } else {
+            file_put_contents($tmpPath, file_get_contents($this->fileUrl));
+        }
         $path = $tmpPath;
         // 保存成远程附件
-        $mediaId = $this->mediaService->uploadAndGetMediaId($agent, $path, MediaType::tryFrom($this->mediaType));
+        $mediaType = MediaType::tryFrom($this->mediaType);
+        if (null === $mediaType) {
+            throw new ApiException('无效的媒体类型: ' . $this->mediaType);
+        }
+        $mediaId = $this->mediaService->uploadAndGetMediaId($agent, $path, $mediaType);
 
         return [
             'media_id' => $mediaId,

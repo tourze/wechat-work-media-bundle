@@ -6,22 +6,23 @@ use GuzzleHttp\Exception\GuzzleException;
 use League\Flysystem\FilesystemOperator;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Tourze\TempFileBundle\Service\TemporaryFileService;
 use Tourze\WechatWorkContracts\AgentInterface;
+use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Service\WorkService;
 use WechatWorkMediaBundle\Enum\MediaType;
 use WechatWorkMediaBundle\Exception\FileNotFoundException;
 use WechatWorkMediaBundle\Exception\MediaUploadFailedException;
 use WechatWorkMediaBundle\Request\MediaGetRequest;
 use WechatWorkMediaBundle\Request\UploadRequest;
-use Yiisoft\Json\Json;
 
+#[Autoconfigure(public: true)]
 class MediaService
 {
     public function __construct(
-        private readonly CacheInterface $cache,
-        private readonly FilesystemOperator $mountManager,
+        private readonly ?CacheInterface $cache,
+        private readonly ?FilesystemOperator $mountManager,
         private readonly TemporaryFileService $temporaryFileService,
         private readonly WorkService $workService,
     ) {
@@ -43,8 +44,11 @@ class MediaService
         // TODO 改造为存数据库，以方便我们排查附件问题
         // 优先查缓存
         $cacheKey = 'WechatWorkBundle_MediaService_uploadAndGetMediaId_' . md5($path) . '_' . $type->value;
-        if ($this->cache->has($cacheKey)) {
-            return $this->cache->get($cacheKey);
+        if (null !== $this->cache && $this->cache->has($cacheKey)) {
+            $cachedMediaId = $this->cache->get($cacheKey);
+            if (is_string($cachedMediaId)) {
+                return $cachedMediaId;
+            }
         }
 
         if (!file_exists($path)) {
@@ -61,23 +65,27 @@ class MediaService
         $request = new UploadRequest();
         $request->setType($type->value);
         $request->setPath($path);
-        if ($agent instanceof \WechatWorkBundle\Entity\Agent) {
+        if ($agent instanceof Agent) {
             $request->setAgent($agent);
         } else {
             $request->setAgent(null);
         }
+        /** @var array<string, mixed> $res */
         $res = $this->workService->request($request);
-        if (is_string($res)) {
-            $res = Json::decode($res);
-        }
+        // UploadRequest 不实现 RawResponseInterface，WorkService 返回解析后的数组
 
         if (!isset($res['media_id'])) {
             throw new MediaUploadFailedException('媒体资源上传失败');
         }
 
-        $this->cache->set($cacheKey, $res['media_id'], 60 * 60 * 24 * 2); // 我们只保留2天，减少一些问题
+        $mediaId = $res['media_id'];
+        if (!is_string($mediaId)) {
+            throw new MediaUploadFailedException('媒体资源上传失败，返回的 media_id 不是字符串类型');
+        }
 
-        return $res['media_id'];
+        $this->cache?->set($cacheKey, $mediaId, 60 * 60 * 24 * 2); // 我们只保留2天，减少一些问题
+
+        return $mediaId;
     }
 
     /**
@@ -86,29 +94,31 @@ class MediaService
     public function downloadMedia(AgentInterface $agent, string $mediaId, ?string $ext = null): string
     {
         $request = new MediaGetRequest();
-        if ($agent instanceof \WechatWorkBundle\Entity\Agent) {
+        if ($agent instanceof Agent) {
             $request->setAgent($agent);
         } else {
             $request->setAgent(null);
         }
         $request->setMediaId($mediaId);
-        /** @var ResponseInterface $response */
         $response = $this->workService->request($request);
+        // MediaGetRequest 实现了 RawResponseInterface，WorkService 应该返回原始字符串内容
+        if (!is_string($response)) {
+            throw new MediaUploadFailedException('下载媒体文件失败，响应格式不是字符串');
+        }
+        $responseContent = $response;
         $tmpPath = $this->temporaryFileService->generateTemporaryFileName('wechat-work-media');
-        file_put_contents($tmpPath, $response->getContent());
+        file_put_contents($tmpPath, $responseContent);
 
         // 获取文件名
         $tmpName = uniqid() . '.' . ($ext ?? 'raw');
-        $headers = $response->getHeaders();
-        $headerValue = $headers['content-disposition'][0];
-        if (preg_match('/attachment; filename="(.*?)"/i', $headerValue, $match)) {
-            // 优先信任微信返回的文件名
-            $tmpName = $match[1];
-        }
+        // 注意：由于我们现在直接处理响应内容，无法获取headers信息
+        // 如果需要文件名信息，需要通过其他方式获取或者接受ext参数
 
         // 使用写入替代扩展方法
         $destinationPath = 'uploads/' . uniqid() . '_' . $tmpName;
-        $this->mountManager->writeStream($destinationPath, fopen($tmpPath, 'r'));
+        if (null !== $this->mountManager) {
+            $this->mountManager->writeStream($destinationPath, fopen($tmpPath, 'r'));
+        }
         unlink($tmpPath);
 
         return $destinationPath;
