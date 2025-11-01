@@ -139,8 +139,7 @@ final class TempMediaCrudControllerTest extends AbstractEasyAdminControllerTestC
 
     public function testValidationErrors(): void
     {
-        $client = self::createClientWithDatabase();
-        $this->loginAsAdmin($client);
+        $client = self::createAuthenticatedClient();
 
         // 访问新建页面
         $crawler = $client->request('GET', '/admin/wechat-work-media/temp-media/new');
@@ -204,8 +203,7 @@ final class TempMediaCrudControllerTest extends AbstractEasyAdminControllerTestC
      */
     public function testEditPageCustomImplementation(): void
     {
-        $client = self::createClientWithDatabase();
-        $this->loginAsAdmin($client);
+        $client = self::createAuthenticatedClient();
 
         // 首先访问首页获取一个记录ID
         $crawler = $client->request('GET', $this->generateAdminUrl('index'));
@@ -240,8 +238,7 @@ final class TempMediaCrudControllerTest extends AbstractEasyAdminControllerTestC
     public function testCustomEditPageValidation(): void
     {
         // 创建客户端并登录
-        $client = self::createClientWithDatabase();
-        $this->loginAsAdmin($client);
+        $client = self::createAuthenticatedClient();
 
         // 检查是否启用了EDIT操作
         try {

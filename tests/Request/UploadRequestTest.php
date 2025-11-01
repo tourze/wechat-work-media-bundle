@@ -3,7 +3,7 @@
 namespace WechatWorkMediaBundle\Tests\Request;
 
 use HttpClientBundle\Request\ApiRequest;
-use HttpClientBundle\Tests\Request\RequestTestCase;
+use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkMediaBundle\Request\UploadRequest;
