@@ -8,6 +8,7 @@ use Tourze\BundleDependency\BundleDependencyInterface;
 use Tourze\JsonRPCLockBundle\JsonRPCLockBundle;
 use Tourze\TempFileBundle\TempFileBundle;
 use WechatWorkBundle\WechatWorkBundle;
+use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 
 class WechatWorkMediaBundle extends Bundle implements BundleDependencyInterface
 {
@@ -18,6 +19,7 @@ class WechatWorkMediaBundle extends Bundle implements BundleDependencyInterface
             JsonRPCLockBundle::class => ['all' => true],
             TempFileBundle::class => ['all' => true],
             WechatWorkBundle::class => ['all' => true],
+            EasyAdminMenuBundle::class => ['all' => true],
         ];
     }
 }
