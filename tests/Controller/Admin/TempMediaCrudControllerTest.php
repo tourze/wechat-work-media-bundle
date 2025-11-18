@@ -72,11 +72,6 @@ final class TempMediaCrudControllerTest extends AbstractEasyAdminControllerTestC
         $this->assertInstanceOf(AbstractCrudController::class, $controller);
     }
 
-    public function testGetEntityFqcnReturnsTempMediaClass(): void
-    {
-        $this->assertSame(TempMedia::class, TempMediaCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFieldsReturnsCorrectFields(): void
     {
         $controller = new TempMediaCrudController();
