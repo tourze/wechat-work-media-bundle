@@ -6,14 +6,16 @@ use League\Flysystem\FilesystemOperator;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
-use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPCLockBundle\Procedure\LockableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkMediaBundle\Enum\MediaType;
+use WechatWorkMediaBundle\Param\TransformFileToWechatWorkMaterialParam;
 use WechatWorkMediaBundle\Service\MediaService;
 
 /**
@@ -26,18 +28,6 @@ use WechatWorkMediaBundle\Service\MediaService;
 #[Autoconfigure(public: true)]
 class TransformFileToWechatWorkMaterial extends LockableProcedure
 {
-    #[MethodParam(description: '企业ID')]
-    public string $corpId;
-
-    #[MethodParam(description: '应用ID')]
-    public string $agentId;
-
-    #[MethodParam(description: '文件URL')]
-    public string $fileUrl;
-
-    #[MethodParam(description: '文件类型')]
-    public string $mediaType;
-
     public function __construct(
         private readonly CorpRepository $corpRepository,
         private readonly AgentRepository $agentRepository,
@@ -46,12 +36,15 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param TransformFileToWechatWorkMaterialParam $param
+     */
+    public function execute(TransformFileToWechatWorkMaterialParam|RpcParamInterface $param): ArrayResult
     {
         // TODO 这里需要校验文件是否有害喔
 
         $corp = $this->corpRepository->findOneBy([
-            'corpId' => $this->corpId,
+            'corpId' => $param->corpId,
         ]);
         if (null === $corp) {
             throw new ApiException('找不到企业信息');
@@ -59,7 +52,7 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
 
         $agent = $this->agentRepository->findOneBy([
             'corp' => $corp,
-            'agentId' => $this->agentId,
+            'agentId' => $param->agentId,
         ]);
         if (null === $agent) {
             throw new ApiException('找不到应用信息');
@@ -68,21 +61,21 @@ class TransformFileToWechatWorkMaterial extends LockableProcedure
         // 先转存文件到本地
         $tmpPath = tempnam(sys_get_temp_dir(), 'wework_material');
         if (null !== $this->mountManager) {
-            $content = $this->mountManager->read($this->fileUrl);
+            $content = $this->mountManager->read($param->fileUrl);
             file_put_contents($tmpPath, $content);
         } else {
-            file_put_contents($tmpPath, file_get_contents($this->fileUrl));
+            file_put_contents($tmpPath, file_get_contents($param->fileUrl));
         }
         $path = $tmpPath;
         // 保存成远程附件
-        $mediaType = MediaType::tryFrom($this->mediaType);
+        $mediaType = MediaType::tryFrom($param->mediaType);
         if (null === $mediaType) {
-            throw new ApiException('无效的媒体类型: ' . $this->mediaType);
+            throw new ApiException('无效的媒体类型: ' . $param->mediaType);
         }
         $mediaId = $this->mediaService->uploadAndGetMediaId($agent, $path, $mediaType);
 
-        return [
+        return new ArrayResult([
             'media_id' => $mediaId,
-        ];
+        ]);
     }
 }

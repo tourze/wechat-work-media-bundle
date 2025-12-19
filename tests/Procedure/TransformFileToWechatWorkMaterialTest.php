@@ -10,13 +10,14 @@ use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
 use Tourze\JsonRPCLockBundle\Procedure\LockableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
+use WechatWorkMediaBundle\Param\TransformFileToWechatWorkMaterialParam;
 use WechatWorkMediaBundle\Procedure\TransformFileToWechatWorkMaterial;
 use WechatWorkMediaBundle\Service\MediaService;
 
@@ -80,7 +81,7 @@ final class TransformFileToWechatWorkMaterialTest extends AbstractProcedureTestC
 
     public function testProcedureHasCorrectProperties(): void
     {
-        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterialParam::class);
 
         $this->assertTrue($reflection->hasProperty('corpId'));
         $this->assertTrue($reflection->hasProperty('agentId'));
@@ -90,7 +91,7 @@ final class TransformFileToWechatWorkMaterialTest extends AbstractProcedureTestC
 
     public function testProcedurePropertiesHaveCorrectAttributes(): void
     {
-        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterial::class);
+        $reflection = new \ReflectionClass(TransformFileToWechatWorkMaterialParam::class);
 
         $corpIdProperty = $reflection->getProperty('corpId');
         $attributes = $corpIdProperty->getAttributes(MethodParam::class);
@@ -135,12 +136,15 @@ final class TransformFileToWechatWorkMaterialTest extends AbstractProcedureTestC
 
         /** @var TransformFileToWechatWorkMaterial $procedure */
         $procedure = self::getService(TransformFileToWechatWorkMaterial::class);
-        $procedure->corpId = 'invalid_corp_id';
-        $procedure->agentId = 'test_agent';
-        $procedure->fileUrl = 'uploads/test.jpg';
-        $procedure->mediaType = 'image';
 
-        $procedure->execute();
+        $param = new TransformFileToWechatWorkMaterialParam(
+            corpId: 'invalid_corp_id',
+            agentId: 'test_agent',
+            fileUrl: 'uploads/test.jpg',
+            mediaType: 'image'
+        );
+
+        $procedure->execute($param);
     }
 
     public function testExecuteWithInvalidAgentId(): void
@@ -158,12 +162,15 @@ final class TransformFileToWechatWorkMaterialTest extends AbstractProcedureTestC
 
         /** @var TransformFileToWechatWorkMaterial $procedure */
         $procedure = self::getService(TransformFileToWechatWorkMaterial::class);
-        $procedure->corpId = 'test_corp_123';
-        $procedure->agentId = 'invalid_agent_id';
-        $procedure->fileUrl = 'uploads/test.jpg';
-        $procedure->mediaType = 'image';
 
-        $procedure->execute();
+        $param = new TransformFileToWechatWorkMaterialParam(
+            corpId: 'test_corp_123',
+            agentId: 'invalid_agent_id',
+            fileUrl: 'uploads/test.jpg',
+            mediaType: 'image'
+        );
+
+        $procedure->execute($param);
     }
 
     public function testExecuteWithInvalidMediaType(): void
@@ -189,10 +196,13 @@ final class TransformFileToWechatWorkMaterialTest extends AbstractProcedureTestC
 
         /** @var TransformFileToWechatWorkMaterial $procedure */
         $procedure = self::getService(TransformFileToWechatWorkMaterial::class);
-        $procedure->corpId = 'test_corp_456';
-        $procedure->agentId = 'test_agent_123';
-        $procedure->fileUrl = 'uploads/test.jpg';
-        $procedure->mediaType = 'invalid_type'; // 无效的媒体类型
+
+        $param = new TransformFileToWechatWorkMaterialParam(
+            corpId: 'test_corp_456',
+            agentId: 'test_agent_123',
+            fileUrl: 'uploads/test.jpg',
+            mediaType: 'invalid_type'
+        );
 
         // 无效媒体类型测试会在文件读取前失败，需要测试文件系统支持
         self::markTestSkipped('Requires filesystem setup to reach media type validation');
