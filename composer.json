@@ -31,7 +31,7 @@
     "tourze/http-client-bundle": "1.1.*",
     "tourze/json-rpc-core": "2.0.*",
     "tourze/json-rpc-lock-bundle": "2.0.*",
-    "tourze/json-rpc-log-bundle": "1.0.*",
+    "tourze/json-rpc-log-bundle": "2.0.*",
     "tourze/symfony-dependency-service-loader": "1.0.*",
     "tourze/symfony-temp-file-bundle": "1.0.*",
     "tourze/wechat-work-bundle": "1.1.*",
